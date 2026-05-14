@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AISWARMIN — Один. Но не один.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080808;
+            --accent-lime: #C8FF00;
+            --accent-purple: #7B61FF;
+            --text: #F0F0F0;
+            --text-secondary: #888888;
+            --card-bg: #0E0E0E;
+            --border: #1A1A1A;
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: auto;
+            background: var(--bg);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ───── ОБЩИЙ КОНТЕЙНЕР ───── */
+        .main-container {
+            position: relative;
+            height: 600vh;
+        }
+
+        /* ───── ЗАЛИПАЮЩАЯ СЕКЦИЯ ───── */
+        .sticky-panel {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ───── ГОРИЗОНТАЛЬНЫЙ ТРЕК ───── */
+        .horizontal-track {
+            display: flex;
+            gap: 0;
+            height: 100%;
+            will-change: transform;
+        }
+
+        /* ───── ЭКРАН ───── */
+        .screen {
+            min-width: 100vw;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 40px 60px;
+            overflow: hidden;
+        }
+
+        /* ───── ЛОГО ───── */
+        .logo-fixed {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 100;
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        .logo-fixed span {
+            color: var(--accent-lime);
+        }
+
+        /* ───── ПРОГРЕСС-БАР ───── */
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent-lime);
+            z-index: 101;
+            transition: width 0.1s linear;
+        }
+
+        /* ═══════════════════════════════════════
+           СЦЕНА 1 — ЛОВУШКА
+           ═══════════════════════════════════════ */
+        .scene1 {
+            background: var(--bg);
+        }
+        .scene1-content {
+            text-align: center;
+            width: 100%;
+            max-width: 900px;
+        }
+        .scene1-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        .scene1-subtitle {
+            font-family: var(--font-heading);
+            font-size: clamp(1rem, 2.5vw, 1.6rem);
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            margin-bottom: 60px;
+        }
+        .team-cards {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .team-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px 28px;
+            width: 220px;
+            text-align: center;
+            transition: all 0.4s var(--ease-expo);
+            position: relative;
+        }
+        .team-card:hover {
+            border-color: #333;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        .team-card .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            position: relative;
+        }
+        .avatar-designer {
+            background: rgba(123, 97, 255, 0.15);
+            border: 2px solid var(--accent-purple);
+        }
+        .avatar-dev {
+            background: rgba(200, 255, 0, 0.1);
+            border: 2px solid var(--accent-lime);
+        }
+        .avatar-devops {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #555;
+        }
+        .team-card .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--accent-lime);
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-lime);
+            animation: statusPulse 2s infinite;
+        }
+        @keyframes statusPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 4px var(--accent-lime);
+            }
+            50% {
+                box-shadow: 0 0 12px var(--accent-lime), 0 0 20px rgba(200, 255, 0, 0.4);
+            }
+        }
+        .team-card .name {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 8px 0 2px;
+        }
+        .team-card .role {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+
+        /* ═══════════════════════════════════════
+           СЦЕНА 2 — ТВИСТ (ГЛИТЧ + РАЗОБЛАЧЕНИЕ)
+           ═══════════════════════════════════════ */
+        .scene2 {
+            background: var(--bg);
+            position: relative;
+        }
+        .scene2-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .glitch-stripe {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent-lime);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .scene2-cards {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        .scene2-cards .team-card {
+            transition: all 0.3s ease;
+        }
+        .scene2-cards.glitching .team-card {
+            animation: cardShake 0.05s infinite;
+        }
+        .scene2-cards.glitching .team-card:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .scene2-cards.glitching .team-card:nth-child(2) {
+            animation-delay: 0.02s;
+        }
+        .scene2-cards.glitching .team-card:nth-child(3) {
+            animation-delay: 0.04s;
+        }
+        @keyframes cardShake {
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(-2px, 1px);
+            }
+            50% {
+                transform: translate(2px, -1px);
+            }
+            75% {
+                transform: translate(-1px, -2px);
+            }
+        }
+        .scene2-cards .team-card.shattering {
+            animation: none;
+            opacity: 0;
+            transform: scale(0.8);
+            filter: blur(4px);
+        }
+        .scene2-stop {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            color: var(--accent-lime);
+            z-index: 10;
+            pointer-events: none;
+            transition: transform 0.5s var(--ease-expo);
+        }
+        .scene2-stop.visible {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .scene2-reveal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.6s var(--ease-expo);
+        }
+        .scene2-reveal.visible {
+            opacity: 1;
+        }
+        .scene2-reveal .reveal-text {
+            font-family: var(--font-heading);
+            font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+        .scene2-reveal .reveal-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-lime);
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: rgba(200, 255, 0, 0.08);
+            box-shadow: 0 0 40px rgba(200, 255, 0, 0.2);
+        }
+        .scene2-reveal .reveal-name {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--accent-lime);
+            letter-spacing: 1px;
+        }
+        .scene2-reveal .reveal-sub {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* ═══════════════════════════════════════
+           СЦЕНА 3 — СИСТЕМА АГЕНТОВ
+           ═══════════════════════════════════════ */
+        .scene3 {
+            background: var(--bg);
+            position: relative;
+        }
+        .scene3-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+        .scene3-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            pointer-events: none;
+        }
+        .scene3-content h2 {
+            font-family: var(--font-heading);
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+        .scene3-content .slogan {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+        .scene3-content .slogan span {
+            color: var(--accent-lime);
+            font-weight: 500;
+        }
+        .agent-tooltip {
+            position: fixed;
+            pointer-events: none;
+            background: var(--card-bg);
+            border: 1px solid var(--accent-purple);
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text);
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 50;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            white-space: nowrap;
+        }
+        .agent-tooltip.visible {
+            opacity: 1;
+        }
+        .agent-tooltip .agent-name {
+            color: var(--accent-purple);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .agent-tooltip .agent-info {
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* ═══════════════════════════════════════
+           СЦЕНА 4 — ЧТО ДЕЛАЮ
+           ═══════════════════════════════════════ */
+        .scene4 {
+            background: var(--bg);
+        }
+        .scene4-content {
+            width: 100%;
+            max-width: 1100px;
+        }
+        .scene4-content h2 {
+            font-family: var(--font-heading);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+        .services-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .service-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px 22px;
+            width: 200px;
+            text-align: center;
+            transition: all 0.4s var(--ease-expo);
+            cursor: default;
+        }
+        .service-card:hover {
+            border-color: var(--accent-lime);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(200, 255, 0, 0.08);
+        }
+        .service-card .service-icon {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+        }
+        .service-card .service-title {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        .service-card .service-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* ═══════════════════════════════════════
+           СЦЕНА 5 — CTA
+           ═══════════════════════════════════════ */
+        .scene5 {
+            background: var(--bg);
+        }
+        .scene5-content {
+            text-align: center;
+        }
+        .scene5-content h2 {
+            font-family: var(--font-heading);
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 16px 48px;
+            border: 2px solid var(--accent-lime);
+            color: var(--accent-lime);
+            text-decoration: none;
+            border-radius: 50px;
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            transition: all 0.4s var(--ease-expo);
+            animation: ctaGlow 2.5s infinite;
+            pointer-events: all;
+            cursor: pointer;
+        }
+        .cta-button:hover {
+            background: var(--accent-lime);
+            color: var(--bg);
+            box-shadow: 0 0 60px rgba(200, 255, 0, 0.4);
+        }
+        @keyframes ctaGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(200, 255, 0, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(200, 255, 0, 0.5), 0 0 80px rgba(200, 255, 0, 0.2);
+            }
+        }
+        .cta-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 16px;
+            letter-spacing: 1px;
+        }
+
+        /* ───── АДАПТИВ ───── */
+        @media (max-width: 768px) {
+            .screen {
+                padding: 30px 20px;
+            }
+            .team-cards {
+                gap: 16px;
+            }
+            .team-card {
+                width: 160px;
+                padding: 20px 16px;
+            }
+            .team-card .avatar {
+                width: 52px;
+                height: 52px;
+                font-size: 1.3rem;
+            }
+            .team-card .name {
+                font-size: 0.9rem;
+            }
+            .services-grid {
+                gap: 12px;
+            }
+            .service-card {
+                width: 150px;
+                padding: 20px 14px;
+            }
+            .logo-fixed {
+                top: 12px;
+                left: 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-fixed"><span>AISWARMIN</span> • ЛЕНДИНГ</div>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="main-container" id="mainContainer">
+
+        <!-- Залипающая панель -->
+        <div class="sticky-panel" id="stickyPanel">
+            <div class="horizontal-track" id="horizontalTrack">
+
+                <!-- ═══════════════ СЦЕНА 1 — ЛОВУШКА ═══════════════ -->
+                <div class="screen scene1" data-scene="1">
+                    <div class="scene1-content">
+                        <h1 class="scene1-title">Студия полного цикла</h1>
+                        <p class="scene1-subtitle">Дизайн. Разработка. DevOps.</p>
+                        <div class="team-cards">
+                            <div class="team-card">
+                                <div class="avatar avatar-designer">◆</div>
+                                <div class="name">Алексей</div>
+                                <div class="role">ДИЗАЙНЕР</div>
+                                <div class="status"><span class="status-dot"></span>онлайн</div>
+                            </div>
+                            <div class="team-card">
+                                <div class="avatar avatar-dev">⬡</div>
+                                <div class="name">Марта</div>
+                                <div class="role">РАЗРАБОТЧИК</div>
+                                <div class="status"><span class="status-dot"></span>онлайн</div>
+                            </div>
+                            <div class="team-card">
+                                <div class="avatar avatar-devops">⬢</div>
+                                <div class="name">Дэн</div>
+                                <div class="role">ДЕВОПС</div>
+                                <div class="status"><span class="status-dot"></span>онлайн</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══════════════ СЦЕНА 2 — ТВИСТ ═══════════════ -->
+                <div class="screen scene2" data-scene="2">
+                    <div class="scene2-overlay" id="glitchOverlay"></div>
+                    <div class="scene2-cards" id="scene2Cards">
+                        <div class="team-card">
+                            <div class="avatar avatar-designer">◆</div>
+                            <div class="name">Алексей</div>
+                            <div class="role">ДИЗАЙНЕР</div>
+                            <div class="status"><span class="status-dot"></span>онлайн</div>
+                        </div>
+                        <div class="team-card">
+                            <div class="avatar avatar-dev">⬡</div>
+                            <div class="name">Марта</div>
+                            <div class="role">РАЗРАБОТЧИК</div>
+                            <div class="status"><span class="status-dot"></span>онлайн</div>
+                        </div>
+                        <div class="team-card">
+                            <div class="avatar avatar-devops">⬢</div>
+                            <div class="name">Дэн</div>
+                            <div class="role">ДЕВОПС</div>
+                            <div class="status"><span class="status-dot"></span>онлайн</div>
+                        </div>
+                    </div>
+                    <div class="scene2-stop" id="scene2Stop">Стоп.</div>
+                    <div class="scene2-reveal" id="scene2Reveal">
+                        <div class="reveal-text">Никакой команды нет.</div>
+                        <div class="reveal-avatar">⬤</div>
+                        <div class="reveal-name">AISWARMIN</div>
+                        <div class="reveal-sub">Один. С роем AI-агентов.</div>
+                    </div>
+                </div>
+
+                <!-- ═══════════════ СЦЕНА 3 — СИСТЕМА АГЕНТОВ ═══════════════ -->
+                <div class="screen scene3" data-scene="3">
+                    <canvas class="scene3-canvas" id="agentCanvas"></canvas>
+                    <div class="scene3-content">
+                        <h2>Архитектура роя</h2>
+                        <p class="slogan">Скорость <span>стартапа</span>. Качество <span>студии</span>. Цена <span>фрилансера</span>.</p>
+                    </div>
+                </div>
+
+                <!-- ═══════════════ СЦЕНА 4 — ЧТО ДЕЛАЮ ═══════════════ -->
+                <div class="screen scene4" data-scene="4">
+                    <div class="scene4-content">
+                        <h2>Что я делаю</h2>
+                        <div class="services-grid">
+                            <div class="service-card">
+                                <div class="service-icon">🌐</div>
+                                <div class="service-title">Сайты под ключ</div>
+                                <div class="service-desc">Лендинги, визитки, корпоративные</div>
+                            </div>
+                            <div class="service-card">
+                                <div class="service-icon">🤖</div>
+                                <div class="service-title">Telegram-боты</div>
+                                <div class="service-desc">Автоматизация, крипто-боты</div>
+                            </div>
+                            <div class="service-card">
+                                <div class="service-icon">🎨</div>
+                                <div class="service-title">Дизайн & брендинг</div>
+                                <div class="service-desc">UI/UX, айдентика</div>
+                            </div>
+                            <div class="service-card">
+                                <div class="service-icon">⚡</div>
+                                <div class="service-title">Быстрые лендинги</div>
+                                <div class="service-desc">Запуск за 2-3 дня</div>
+                            </div>
+                            <div class="service-card">
+                                <div class="service-icon">📱</div>
+                                <div class="service-title">Верстка & адаптив</div>
+                                <div class="service-desc">Pixel-perfect, все устройства</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══════════════ СЦЕНА 5 — CTA ═══════════════ -->
+                <div class="screen scene5" data-scene="5">
+                    <div class="scene5-content">
+                        <h2>Есть задача?</h2>
+                        <a href="https://t.me/aiswarmin" class="cta-button" target="_blank">Написать в Telegram</a>
+                        <p class="cta-sub">Обычно отвечаю за 15 минут.</p>
+                    </div>
+                </div>
+
+            </div><!-- /horizontal-track -->
+        </div><!-- /sticky-panel -->
+
+    </div><!-- /main-container -->
+
+    <!-- Тултип агента -->
+    <div class="agent-tooltip" id="agentTooltip">
+        <div class="agent-name"></div>
+        <div class="agent-info"></div>
+    </div>
+
+    <script>
+        (function() {
+            // ─────────────── ЭЛЕМЕНТЫ ───────────────
+            const mainContainer = document.getElementById('mainContainer');
+            const stickyPanel = document.getElementById('stickyPanel');
+            const horizontalTrack = document.getElementById('horizontalTrack');
+            const progressBar = document.getElementById('progressBar');
+            const screens = document.querySelectorAll('.screen');
+            const totalScreens = screens.length;
+
+            // Сцена 2
+            const scene2Cards = document.getElementById('scene2Cards');
+            const glitchOverlay = document.getElementById('glitchOverlay');
+            const scene2Stop = document.getElementById('scene2Stop');
+            const scene2Reveal = document.getElementById('scene2Reveal');
+
+            // Сцена 3
+            const agentCanvas = document.getElementById('agentCanvas');
+            const agentTooltip = document.getElementById('agentTooltip');
+
+            let trackWidth = 0;
+            let scrollProgress = 0;
+            let scene2Phase = 'idle'; // idle | glitching | stop | reveal
+
+            // ─────────────── ПЕРЕСЧЁТ РАЗМЕРОВ ───────────────
+            function resize() {
+                trackWidth = horizontalTrack.scrollWidth - window.innerWidth;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            // ─────────────── СКРОЛЛ-ЛОГИКА ───────────────
+            function updateScroll() {
+                const mainRect = mainContainer.getBoundingClientRect();
+                const panelTop = stickyPanel.offsetTop;
+                const mainHeight = mainContainer.offsetHeight;
+                const panelHeight = stickyPanel.offsetHeight;
+                const maxScroll = mainHeight - panelHeight;
+
+                // Прогресс скролла внутри mainContainer
+                const rawProgress = -mainRect.top / maxScroll;
+                scrollProgress = Math.max(0, Math.min(1, rawProgress));
+
+                // Двигаем горизонтальный трек
+                const translateX = -(scrollProgress * trackWidth);
+                horizontalTrack.style.transform = `translateX(${translateX}px)`;
+
+                // Прогресс-бар
+                progressBar.style.width = `${scrollProgress * 100}%`;
+
+                // Сцена 2 — управление фазами
+                updateScene2(scrollProgress);
+
+                // Обновляем canvas агентов
+                updateAgentCanvas();
+            }
+
+            // ─────────────── СЦЕНА 2 — ГЛИТЧ И ТВИСТ ───────────────
+            // Сцена 2 занимает прогресс от 0.2 до 0.45 (примерно)
+            const S2_START = 0.18;
+            const S2_GLITCH_PEAK = 0.28;
+            const S2_STOP = 0.33;
+            const S2_REVEAL = 0.40;
+            const S2_END = 0.48;
+
+            function updateScene2(progress) {
+                if (progress < S2_START) {
+                    resetScene2();
+                    return;
+                }
+                if (progress > S2_END) {
+                    // Завершаем сцену 2 в финальном состоянии
+                    if (scene2Phase !== 'revealed') {
+                        finalizeScene2();
+                    }
+                    return;
+                }
+
+                // Фаза глитча
+                if (progress >= S2_START && progress < S2_STOP) {
+                    if (scene2Phase !== 'glitching') {
+                        scene2Phase = 'glitching';
+                        scene2Cards.classList.add('glitching');
+                        scene2Stop.classList.remove('visible');
+                        scene2Reveal.classList.remove('visible');
+                    }
+                    // Интенсивность глитча
+                    const glitchIntensity = Math.min(1, (progress - S2_START) / (S2_GLITCH_PEAK - S2_START));
+                    applyGlitch(glitchIntensity);
+                }
+
+                // Фаза СТОП
+                if (progress >= S2_STOP && progress < S2_REVEAL) {
+                    if (scene2Phase !== 'stop') {
+                        scene2Phase = 'stop';
+                        scene2Cards.classList.add('glitching');
+                        // "Разрушаем" карточки
+                        scene2Cards.querySelectorAll('.team-card').forEach(card => {
+                            card.classList.add('shattering');
+                        });
+                        scene2Stop.classList.add('visible');
+                        clearGlitch();
+                    }
+                }
+
+                // Фаза разоблачения
+                if (progress >= S2_REVEAL) {
+                    if (scene2Phase !== 'reveal') {
+                        scene2Phase = 'reveal';
+                        scene2Cards.querySelectorAll('.team-card').forEach(card => {
+                            card.style.display = 'none';
+                        });
+                        scene2Stop.classList.remove('visible');
+                        scene2Reveal.classList.add('visible');
+                        clearGlitch();
+                    }
+                }
+            }
+
+            function resetScene2() {
+                scene2Phase = 'idle';
+                scene2Cards.classList.remove('glitching');
+                scene2Cards.querySelectorAll('.team-card').forEach(card => {
+                    card.classList.remove('shattering');
+                    card.style.display = '';
+                });
+                scene2Stop.classList.remove('visible');
+                scene2Reveal.classList.remove('visible');
+                clearGlitch();
+            }
+
+            function finalizeScene2() {
+                scene2Phase = 'revealed';
+                scene2Cards.querySelectorAll('.team-card').forEach(card => {
+                    card.style.display = 'none';
+                });
+                scene2Stop.classList.remove('visible');
+                scene2Reveal.classList.add('visible');
+                clearGlitch();
+            }
+
+            function applyGlitch(intensity) {
+                // Очищаем предыдущие полосы
+                clearGlitch();
+                if (intensity < 0.1) return;
+
+                const stripeCount = Math.floor(intensity * 20);
+                for (let i = 0; i < stripeCount; i++) {
+                    const stripe = document.createElement('div');
+                    stripe.className = 'glitch-stripe';
+                    stripe.style.top = Math.random() * 100 + '%';
+                    stripe.style.height = (2 + Math.random() * 6) + 'px';
+                    stripe.style.opacity = Math.random() * 0.8;
+                    stripe.style.background = Math.random() > 0.5 ? 'var(--accent-lime)' :
+                        'var(--accent-purple)';
+                    glitchOverlay.appendChild(stripe);
+
+                    // Удаляем через короткое время
+                    setTimeout(() => stripe.remove(), 80 + Math.random() * 120);
+                }
+            }
+
+            function clearGlitch() {
+                glitchOverlay.innerHTML = '';
+            }
+
+            // ─────────────── СЦЕНА 3 — CANVAS АГЕНТОВ ───────────────
+            const ctx = agentCanvas.getContext('2d');
+            let agentNodes = [];
+            const AGENT_COUNT = 30;
+
+            function initAgentCanvas() {
+                agentCanvas.width = agentCanvas.parentElement.offsetWidth;
+                agentCanvas.height = agentCanvas.parentElement.offsetHeight;
+                agentNodes = [];
+
+                const centerX = agentCanvas.width / 2;
+                const centerY = agentCanvas.height / 2;
+
+                // Центральный узел (ты)
+                agentNodes.push({
+                    x: centerX,
+                    y: centerY,
+                    radius: 8,
+                    color: '#C8FF00',
+                    isCore: true,
+                    label: 'AISWARMIN',
+                    info: 'Оператор роя',
+                    vx: 0,
+                    vy: 0,
+                });
+
+                // Агенты
+                const agentDefs = [
+                    { label: 'α — UI/UX', info: 'Дизайн интерфейсов. 2 ч.' },
+                    { label: 'β — Frontend', info: 'Верстка, React. 4 ч.' },
+                    { label: 'γ — Backend', info: 'API, базы данных. 5 ч.' },
+                    { label: 'δ — DevOps', info: 'Сервера, деплой. 1 ч.' },
+                    { label: 'ε — Copywrite', info: 'Тексты, смыслы. 30 мин.' },
+                ];
+
+                for (let i = 0; i < AGENT_COUNT; i++) {
+                    const angle = (i / AGENT_COUNT) * Math.PI * 2;
+                    const dist = 120 + Math.random() * 180;
+                    const def = agentDefs[i % agentDefs.length];
+                    agentNodes.push({
+                        x: centerX + Math.cos(angle) * dist,
+                        y: centerY + Math.sin(angle) * dist,
+                        radius: 3 + Math.random() * 4,
+                        color: i % 2 === 0 ? '#7B61FF' : '#C8FF00',
+                        isCore: false,
+                        label: def.label,
+                        info: def.info,
+                        vx: (Math.random() - 0.5) * 0.4,
+                        vy: (Math.random() - 0.5) * 0.4,
+                        orbitAngle: angle,
+                        orbitRadius: dist,
+                        orbitSpeed: 0.002 + Math.random() * 0.004,
+                    });
+                }
+            }
+
+            function updateAgentCanvas() {
+                if (!agentNodes.length) initAgentCanvas();
+
+                const centerX = agentCanvas.width / 2;
+                const centerY = agentCanvas.height / 2;
+
+                // Обновляем позиции
+                agentNodes.forEach((node, i) => {
+                    if (node.isCore) {
+                        node.x = centerX;
+                        node.y = centerY;
+                    } else {
+                        node.orbitAngle += node.orbitSpeed;
+                        node.x = centerX + Math.cos(node.orbitAngle) * node.orbitRadius;
+                        node.y = centerY + Math.sin(node.orbitAngle) * node.orbitRadius;
+                        node.orbitRadius += (Math.random() - 0.5) * 0.3;
+                        node.orbitRadius = Math.max(80, Math.min(320, node.orbitRadius));
+                    }
+                });
+
+                // Рисуем
+                ctx.clearRect(0, 0, agentCanvas.width, agentCanvas.height);
+
+                // Сетка
+                ctx.strokeStyle = '#1A1A1A';
+                ctx.lineWidth = 0.5;
+                const gridSize = 80;
+                for (let x = gridSize; x < agentCanvas.width; x += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, agentCanvas.height);
+                    ctx.stroke();
+                }
+                for (let y = gridSize; y < agentCanvas.height; y += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(agentCanvas.width, y);
+                    ctx.stroke();
+                }
+
+                // Линии от центра к агентам
+                const core = agentNodes[0];
+                agentNodes.forEach((node, i) => {
+                    if (i === 0) return;
+                    ctx.strokeStyle = 'rgba(123, 97, 255, 0.15)';
+                    ctx.lineWidth = 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(core.x, core.y);
+                    ctx.lineTo(node.x, node.y);
+                    ctx.stroke();
+                });
+
+                // Узлы
+                agentNodes.forEach((node, i) => {
+                    if (i === 0) {
+                        // Ядро — пульсирует
+                        const pulse = 1 + Math.sin(Date.now() * 0.005) * 0.3;
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, node.radius * pulse, 0, Math.PI * 2);
+                        ctx.fillStyle = node.color;
+                        ctx.fill();
+                        ctx.strokeStyle = 'rgba(200,255,0,0.5)';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = node.color;
+                        ctx.fill();
+                    }
+                });
+            }
+
+            // ─────────────── ХОВЕР ПО АГЕНТАМ (тултип) ───────────────
+            agentCanvas.addEventListener('mousemove', (e) => {
+                const rect = agentCanvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+
+                let found = null;
+                agentNodes.forEach(node => {
+                    const dx = mx - node.x;
+                    const dy = my - node.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const hitRadius = node.isCore ? 30 : 20;
+                    if (dist < hitRadius) found = node;
+                });
+
+                if (found) {
+                    agentTooltip.querySelector('.agent-name').textContent = found.label;
+                    agentTooltip.querySelector('.agent-info').textContent = found.info;
+                    agentTooltip.style.left = (e.clientX + 20) + 'px';
+                    agentTooltip.style.top = (e.clientY - 40) + 'px';
+                    agentTooltip.classList.add('visible');
+                    agentCanvas.style.cursor = 'pointer';
+                } else {
+                    agentTooltip.classList.remove('visible');
+                    agentCanvas.style.cursor = 'default';
+                }
+            });
+
+            agentCanvas.addEventListener('mouseleave', () => {
+                agentTooltip.classList.remove('visible');
+            });
+
+            // ─────────────── СОБЫТИЯ СКРОЛЛА ───────────────
+            window.addEventListener('scroll', updateScroll, { passive: true });
+            window.addEventListener('resize', () => {
+                resize();
+                initAgentCanvas();
+                updateScroll();
+            });
+
+            // Инициализация
+            resize();
+            initAgentCanvas();
+            updateScroll();
+
+            // Запуск canvas-анимации
+            function canvasLoop() {
+                updateAgentCanvas();
+                requestAnimationFrame(canvasLoop);
+            }
+            canvasLoop();
+
+        })();
+    </script>
+</body>
+</html>
